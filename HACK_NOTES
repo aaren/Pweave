@@ -1,0 +1,162 @@
+I want to modify pweave so that it can take normal looking code
+blocks as input.
+
+Alternately, modify so that it spits out github markdown instead of
+pandoc.
+
+When replacing code block with an image, make it either a local
+image or one on github.
+
+
+basic pweave flow for 'file' (string):
+
+    doc = Pweb(file)
+    doc.setformat
+
+then
+
+    doc.weave(shell)      # processes Pweave document
+    doc.tangle()          # extracts code from chunks to .py
+
+both of these first do
+
+    doc.parse()
+
+where
+
+    def parse(self, string = None, basename = "string_input"):
+        """Parse document""" 
+        if string is None:
+            parser = self.Reader(file = self.source)
+        else:
+            parser = self.Reader(string = string)
+            self.source = basename
+        parser.parse()
+        self.parsed = parser.getparsed()
+        self.isparsed = True
+
+i.e. calls parse() method of a Reader object.
+
+the reader is chosen as
+
+    self.Reader = readers.PwebReader
+
+and can be set with
+
+    self.setreader()
+
+
+### Reader parsing ###
+
+Sets an initial state, `self.state = 'doc'`. Goes through each line, 
+checking whether a code or doc start.
+
+If a code start line, and the current state is not code, set state = 'code'
+and extract a list of options from the line and append to chunks.
+
+If a doc start line (default '@'), and state is 'code', change state
+to 'doc' and append to chunks.
+
+What is appended to chunks is the content of the *previous* block. i.e.
+if we are on a doc start line, append the block of code before.
+
+    chunks = [{'type': ,         # 'doc' or 'code'
+               'content': ,      # lines joined by \n
+               'number':         # line number of start of chunk
+               'options':        # code options (not for 'doc'), ...]
+
+calling `parser.getparsed` returns this list.
+
+
+### Running ###
+
+Pweb calls self.run:
+
+    Runner = PwebProcessors.formats[shell]['class']
+    runner = Runner(copy.deepcopy(self.parsed), self.source, 
+                    self.documentationmode, self.formatter.getformatdict())
+    runner.run()
+
+runner.run basically maps runner._runcode onto chunks. This executes
+the code and deals with figures.
+
+
+Pweb then does
+
+    self.format()
+    self.write()
+
+write is pretty dumb and simple - it basically writes self.formatted
+to a file. format is more complex:
+
+    # input
+    self.formatter.setexecuted(copy.deepcopy(self.executed))
+    # process
+    self.formatter.format()
+    # output
+    self.formatted =  self.formatter.getformatted()
+
+(the formatter is set in __init__.py)
+
+format calls formatter.format_docchunk on 'doc' and 
+formatter.format_codechunks(chunk) on 'code'
+
+format.docchunk is a simple pass through by default
+format.codechunks is more complicated and does things based on chunk
+options.
+
+* question: what text replaces code? *
+
+There are numerous formatters, which all inherit from the same base.
+Two extra methods are set: initformat, which sets the code start / end;
+and formatfigure, which creates figure text.
+
+Extension plan
+--------------
+
+- allow arbitrary regex in codestarts and docstarts, like in knitr patterns.
+- allow indented code
+- write a formatter, similar to PwebPandocFormatter, with output
+  using gfm ?can pandoc convert to gfm?
+
+- what about inline code??
+
+codestart / docstart:
+
+    import re
+
+    code_begin = "^\\s*<<(.*)>>=$"
+    doc_begin = "^@$"
+
+    def codestart(self, line):
+        if not re.match(code_begin, line):
+            return ((false, true))
+        else:
+            return ((true, true))
+
+    def docstart(self, line):
+        if not re.match(doc_begin, line.strip()):
+            return ((False, True))
+        else:
+            return ((True, True))
+
+Remove the second boolean?? It is used by skip in parse, which
+doesn't do anything. Two commits - change with skip; remove skip.
+
+also modify getoptions:
+
+    rel = re.match(code_begin, line)
+    optstring = rel.groups()[0]
+
+    opts = [o.strip() for o in optstring.split(',')]
+
+    # requires python 2.7+
+    chunkoptions = {k: v for k, v in (o.split('=') for o in opts)}
+    # alternately
+    chunkoptions = dict((k, v) for k, v in (o.split('=') for o in opts))
+    # EVEN BETTER - dict can work with simple formats
+    chunkoptions = dict(o.split('=') for o in opts)
+
+
+put the code_begin and doc_begin in the class init
+OR put them in a patterns dict.
