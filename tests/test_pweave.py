@@ -35,3 +35,9 @@ def test_pweave():
     out = open(outfile)
     ref = open(REF)
     assert(out.read() == ref.read())
+
+
+def test_pweave_alt():
+    # TODO: test with some new code matching regex and a different
+    # input mdw, e.g. with ```python {options} marking the code start.
+    pass
