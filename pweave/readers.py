@@ -225,9 +225,18 @@ class PwebNBReader(object):
     def getparsed(self):
         return(copy.deepcopy(self.parsed))
 
+class PWebGFMReader(PwebReader):
+    # regex that matches beginning of code block
+    code_begin = r"^\s*```+python\s*\{(.*)\}$"
+    doc_begin = r"^\s*```+$"
+
+    def __init__(self, file = None, string = None):
+        PwebReader.__init__(self, file, string)
+
 class PwebReaders(object):
     """Lists available input formats"""
     formats = {'noweb' : {'class' : PwebReader, 'description' :  'Noweb document'},
+               'gfm' : {'class' : PWebGFMReader, 'description' :  'GFM format'},
                'script' : {'class' : PwebScriptReader, 'description' :  'Script format'},
                'notebook' : {'class' : PwebNBReader, 'description' :  'IPython notebook'}
                }

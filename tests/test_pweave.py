@@ -40,4 +40,13 @@ def test_pweave():
 def test_pweave_alt():
     # TODO: test with some new code matching regex and a different
     # input mdw, e.g. with ```python {options} marking the code start.
-    pass
+    REF = 'tests/simple_REF.md'
+    infile = 'tests/simple.gmdw'
+    outfile = 'tests/simple.md'
+    pweave.pweave(file=infile, doctype="pandoc",
+                  informat='gfm', figdir='tests/figures')
+
+    # Compare the outfile and the ref
+    out = open(outfile)
+    ref = open(REF)
+    assert(out.read() == ref.read())
