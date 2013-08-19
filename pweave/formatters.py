@@ -383,6 +383,36 @@ class PwebPandocFormatter(PwebFormatter):
             result += figstring 
         return(result)
 
+class PwebGFMFormatter(PwebFormatter):
+
+    def initformat(self):
+            self.formatdict = dict(codestart = '```python',
+                codeend = '```\n\n',
+                outputstart = '```python',
+                outputend = '```\n\n',
+                indent = '',
+                termindent = '',
+                figfmt = '.png',
+                extension = 'md',
+                width = '15 cm',
+                doctype = 'pandoc')
+
+    def formatfigure(self, chunk):
+        fignames = chunk['figure']
+        caption = chunk['caption']
+        width = chunk['width']
+        result = ""
+        figstring = ""
+
+        for fig in fignames:
+            figstring += '![](%s)\\\n' % (fig)
+
+        if chunk['caption']:
+            result += '![%s](%s)\n' % (caption, fignames[0])
+        else:
+            result += figstring
+        return(result)
+
 class PwebSphinxFormatter(PwebRstFormatter):
 
     def initformat(self):
@@ -605,6 +635,7 @@ class PwebFormats(object):
                'texpygments' : {'class' : PwebTexPygmentsFormatter, 'description' :  'Latex output with pygments highlighted output'},
                'rst' : {'class' : PwebRstFormatter, 'description' :  'reStructuredText'}, 
                'pandoc' :  {'class' : PwebPandocFormatter, 'description' :  'Pandoc markdown'}, 
+               'gfm' :  {'class' : PwebGFMFormatter, 'description' :  'Github markdown'},
                'sphinx' : {'class' : PwebSphinxFormatter, 'description' :  'reStructuredText for Sphinx'}, 
                'html' : {'class' : PwebHTMLFormatter, 'description' :  'HTML with pygments highlighting'},
                'md2html' : {'class' : PwebMDtoHTMLFormatter, 'description' :  'Markdown to HTML using Python-Markdown'},
