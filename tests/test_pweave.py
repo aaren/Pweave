@@ -41,8 +41,8 @@ def test_pweave_alt():
     # TODO: test with some new code matching regex and a different
     # input mdw, e.g. with ```python {options} marking the code start.
     REF = 'tests/simple_gfmREF.md'
-    infile = 'tests/simple.gmdw'
-    outfile = 'tests/simple.md'
+    infile = 'tests/simple_gfm.mdw'
+    outfile = 'tests/simple_gfm.md'
     pweave.pweave(file=infile, doctype="gfm",
                   informat='gfm', figdir='tests/figures')
 
