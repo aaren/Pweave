@@ -180,17 +180,14 @@ class PwebProcessor(object):
         if Pweb.usematplotlib:
             import matplotlib.pyplot as plt
             #Iterate over figures
-            figs = plt.get_fignums()
-            #print figs
-            for i in figs:
-                plt.figure(i)
-                plt.figure(i).set_size_inches(chunk['f_size'])
-                #plt.figure(i).set_size_inches(4,4)
+            for i in plt.get_fignums():
+                fig = plt.figure(i)
+                fig.set_size_inches(chunk['f_size'])
 
                 name = os.path.join(Pweb.figdir, prefix + "_" + str(i) + self.formatdict['figfmt'])
                 for format in self.formatdict['savedformats']:
                     fpath = os.path.join(Pweb.figdir, prefix + "_" + str(i) + format)
-                    plt.savefig(fpath)
+                    fig.savefig(fpath)
                     plt.draw()
                 fignames.append(name)
                 #plt.clf()
