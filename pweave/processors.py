@@ -51,7 +51,7 @@ class PwebProcessor(object):
         """A method used to pickle stuff for persistence"""
         if not os.path.isdir(Pweb.cachedir):
             os.mkdir(Pweb.cachedir)
-        name = Pweb.cachedir + '/' + self._basename() + '.pkl'
+        name = os.path.join(Pweb.cachedir, self._basename() + '.pkl')
         f = open(name, 'wb')
         pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
         f.close()
@@ -187,9 +187,10 @@ class PwebProcessor(object):
                 plt.figure(i).set_size_inches(chunk['f_size'])
                 #plt.figure(i).set_size_inches(4,4)
 
-                name = Pweb.figdir + '/' + prefix + "_" + str(i) + self.formatdict['figfmt']
+                name = os.path.join(Pweb.figdir, prefix + "_" + str(i) + self.formatdict['figfmt'])
                 for format in self.formatdict['savedformats']:
-                    plt.savefig(Pweb.figdir + '/' + prefix + "_" + str(i) + format)
+                    fpath = os.path.join(Pweb.figdir, prefix + "_" + str(i) + format)
+                    plt.savefig(fpath)
                     plt.draw()
                 fignames.append(name)
                 #plt.clf()
@@ -197,7 +198,7 @@ class PwebProcessor(object):
 
         if Pweb.usesho:
             from sho import saveplot
-            figname = Pweb.figdir + '/' + prefix + self.formatdict['figfmt']
+            figname = os.path.join(Pweb.figdir, prefix + self.formatdict['figfmt'])
             saveplot(figname)
             fignames = [figname]
 
@@ -205,7 +206,7 @@ class PwebProcessor(object):
 
     def restore(self):
         """A method used to unpickle stuff"""
-        name = Pweb.cachedir + '/' + self._basename() + '.pkl'
+        name = os.path.join(Pweb.cachedir, self._basename() + '.pkl')
         if os.path.exists(name):
             f = open(name, 'rb')
             self._oldresults = pickle.load(f)
