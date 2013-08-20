@@ -1,4 +1,5 @@
 import os
+import shutil
 import errno
 
 import pweave
@@ -30,6 +31,29 @@ def test_pweave():
     infile = 'tests/simple.mdw'
     outfile = 'tests/simple.md'
     pweave.pweave(file=infile, doctype="pandoc", figdir='tests/figures')
+
+    # Compare the outfile and the ref
+    out = open(outfile)
+    ref = open(REF)
+    assert(out.read() == ref.read())
+
+
+def test_abs_path():
+    """Test pweave with absolute paths
+
+    N.B. can't use anything in the .mdw that will give different
+    outputs each time. For example, setting term=True and then
+    calling figure() will output a matplotlib figure reference. This
+    has a memory pointer that changes every time.
+    """
+    REF = 'tests/simple_REF_abs.md'
+    infile = 'tests/simple.mdw'
+    absinfile = '/tmp/simple.mdw'
+    outfile = '/tmp/simple.md'
+
+    shutil.copyfile(infile, absinfile)
+
+    pweave.pweave(file=absinfile, doctype="pandoc", figdir='tests/figures')
 
     # Compare the outfile and the ref
     out = open(outfile)
