@@ -532,6 +532,70 @@ class PwebPandocMDtoHTMLFormatter(PwebMDtoHTMLFormatter):
         self.formatted = pandoc.communicate()[0]
         #return(chunk['content'])
         
+class PwebNBFormatter(PwebFormatter):
+    """Format an IPython Notebook."""
+    def initformat(self):
+            self.formatdict = dict(codestart = '',
+                codeend = '',
+                outputstart = '',
+                outputend = '',
+                indent = '',
+                termindent = '',
+                figfmt = '.png',
+                extension = 'ipynb',
+                width = '15 cm',
+                doctype = 'ipynb')
+     
+    def format(self):
+        """The underlying notebook format is JSON.
+
+        IPython comes with all the tools that we need to create
+        a simple notebook using our code and doc chunks.
+        """
+        from IPython.nbformat.v3 import (new_notebook, new_worksheet,
+                                        new_code_cell, new_text_cell,
+                                        writes_json)
+
+        ws = new_worksheet()
+
+        for chunk in self.executed:
+            #Fill in options for code chunks
+            if chunk['type'] == "code":
+                for key in self.formatdict.keys():
+                    if key in chunk:
+                        chunk[key] = self.formatdict[key]
+
+            #Wrap text if option is set
+            if chunk['type'] == "code":
+                if chunk['wrap'] is True:
+                    chunk['content'] = self._wrap(chunk['content'])
+                    chunk['result'] = self._wrap(chunk['result'])
+                if chunk['wrap'] == 'code':
+                    chunk['content'] = self._wrap(chunk['content'])
+                if chunk['wrap'] == 'results':
+                    chunk['result'] = self._wrap(chunk['result'])
+
+            #Preformat chunk content before default formatters
+            chunk = self.preformat_chunk(chunk)
+
+            if chunk['type'] == "doc":
+                fmt = u'markdown'
+                doc = chunk['content']
+                ws.cells.append(new_text_cell(fmt, source=doc))
+            elif chunk['type'] == "code":
+                lang = u'python'
+                code = chunk['content']
+                ws.cells.append(new_code_cell(input=code, language=lang))
+            else:
+                # case that there is a chunk with some other type
+                fmt = 'raw'
+                ws.cells.append(new_text_cell(fmt, source=chunk["content"]))
+
+        NB = new_notebook(name='Pweaved ipython notebook',
+                          worksheets=[ws])
+
+        self.formatted = writes_json(NB)
+
 
 class PwebPandoctoTexFormatter(PwebTexPygmentsFormatter):
 
@@ -609,7 +673,8 @@ class PwebFormats(object):
                'html' : {'class' : PwebHTMLFormatter, 'description' :  'HTML with pygments highlighting'},
                'md2html' : {'class' : PwebMDtoHTMLFormatter, 'description' :  'Markdown to HTML using Python-Markdown'},
                'pandoc2latex' : {'class' : PwebPandoctoTexFormatter, 'description' :  'Markdown to Latex using Pandoc, requires Pandoc in path'},
-               'pandoc2html' : {'class' : PwebPandocMDtoHTMLFormatter, 'description' :  'Markdown to HTML using Pandoc, requires Pandoc in path'}
+               'pandoc2html' : {'class' : PwebPandocMDtoHTMLFormatter, 'description' :  'Markdown to HTML using Pandoc, requires Pandoc in path'},
+               'ipynb' : {'class' : PwebNBFormatter, 'description' :  'Simple ipython notebook writer'},
                }
     
     @classmethod
