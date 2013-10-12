@@ -9,10 +9,11 @@ from subprocess import Popen, PIPE
 __version__ = '0.22rc'
 
 
-def pweave(file, doctype = 'rst', informat = "noweb", shell="python", plot = True,
-           docmode = False, cache = False,
-           figdir = 'figures', cachedir = 'cache',
-           figformat = None, returnglobals = True, listformats = False):
+def pweave(file, doctype='rst', informat="noweb",
+           shell="python", plot=True, docmode=False,
+           figdir='figures', figformat=None,
+           cache=False, cachedir='cache',
+           returnglobals=True, listformats=False):
     """
     Processes a Pweave document and writes output to a file
 
@@ -36,13 +37,10 @@ def pweave(file, doctype = 'rst', informat = "noweb", shell="python", plot = Tru
 
     assert file != "" is not None, "No input specified"
 
-
     doc = Pweb(file)
     doc.setformat(doctype)
 
     doc.setreader(readers.PwebReaders.formats[informat]['class'])
-
-
 
     if sys.platform == 'cli':
         Pweb.usesho = plot
