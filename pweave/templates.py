@@ -12,7 +12,7 @@ htmltemplate["header"] = ("""
     <script type="text/javascript"
     src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
     </script>
-  
+
     <style>
       body
       {
@@ -35,15 +35,15 @@ htmltemplate["header"] = ("""
       {
       color : maroon;
       }
-      
-      .highlight 
+
+      .highlight
       {
       border-style:solid;
       border-width : 1px;
       border-color : gray;
       padding-left : 5px;
       }
-      
+
       a
       {
       color : maroon;
@@ -58,7 +58,7 @@ htmltemplate["header"] = ("""
 
       %s
 
-    </style>        
+    </style>
   </HEAD>
   <BODY>
 """ % HtmlFormatter().get_style_defs())

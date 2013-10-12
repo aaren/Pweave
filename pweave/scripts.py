@@ -36,13 +36,13 @@ def weave():
                       help="Figure format for matplotlib graphics: Defaults to 'png' for rst and Sphinx html documents and 'pdf' for tex")
 
     (options, args) = parser.parse_args()
-    
+
     try:
         infile = args[0]
     except:
         infile = ""
-    
-   
+
+
 
     mplotlib = (options.mplotlib.lower() == 'true')
 
@@ -62,7 +62,7 @@ def publish():
     parser = OptionParser(usage="pypublish [options] sourcefile", version="Part of Pweave " + pweave.__version__)
     parser.add_option("-f", "--format", dest="format", default='html',
                       help = "Output format html or pdf, pdf output requires pandoc and pdflatex")
-    
+
     (options, args) = parser.parse_args()
 
     try:
@@ -92,12 +92,10 @@ def convert():
                       help = "Output format script or noweb")
     parser.add_option("-p", "--pandoc", dest="pandoc_args", default=None,
                       help = "passed to pandoc for converting doc chunks")
-    
+
     (options, args) = parser.parse_args()
 
     infile = args[0]
 
     #print options
     pweave.convert(infile, options.informat, options.outformat, options.pandoc_args)
-
-    

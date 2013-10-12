@@ -22,7 +22,7 @@ class PwebProcessor(object):
 
     def _basename(self):
         return(re.split("\.+[^\.]+$", self.source)[0])
-        
+
     def run(self):
         #Create directory for figures
         if not os.path.isdir(Pweb.figdir):
@@ -33,7 +33,7 @@ class PwebProcessor(object):
         if self.documentationmode:
            success = self._getoldresults()
            if success:
-               print "restoring" 
+               print "restoring"
                return
            else:
                sys.stderr.write("DOCUMENTATION MODE ERROR:\nCan't find stored results, running the code and caching results for the next documentation mode run\n")
@@ -76,12 +76,12 @@ class PwebProcessor(object):
          #Read the content from file or object
         if chunk.has_key("source"):
             source = chunk["source"]
-            if os.path.isfile(source): 
+            if os.path.isfile(source):
                 chunk["content"] = open(source, "r").read()  + chunk['content']
             else:
                 chunk["content"] = self.loadstring("import inspect\nprint(inspect.getsource(%s))" % source) + chunk['content']
 
-        
+
 
         #Make function to dispatch based on the type
         #Execute a function from a list of functions
@@ -102,14 +102,14 @@ class PwebProcessor(object):
         if chunk['engine'] == "shell":
             sys.stdout.write("Processing chunk %(number)s named %(name)s\n" % chunk)
             chunk['result']  = self.load_shell(chunk)
-                 
+
             #chunk['term'] = True
             return(chunk)
 
         #Settings for figures, matplotlib and sho
         #if chunk['width'] is None:
         #        chunk['width'] = self.formatdict['width']
-        
+
         if Pweb.usematplotlib:
             if not Pweb._mpl_imported:
                 import matplotlib
@@ -161,8 +161,8 @@ class PwebProcessor(object):
                     chunk['result'] = self.loadstring(chunk['content'])
         #After executing the code save the figure
         if chunk['fig']:
-            chunk['figure'] = self.savefigs(chunk)                
-        
+            chunk['figure'] = self.savefigs(chunk)
+
         if old_content != None:
             chunk['content'] = old_content # The code from current chunk for display
 
@@ -174,7 +174,7 @@ class PwebProcessor(object):
             prefix = self._basename() + '_figure' + str(chunk['number'])
         else:
             prefix = self._basename() + '_' + chunk['name']
-        
+
         fignames = []
 
         if Pweb.usematplotlib:
@@ -254,7 +254,7 @@ class PwebProcessor(object):
         #        sys.stderr.write('WARNING: contents of chunk number %(number)s (name = %(name)s) have changed\n' % chunk)
         #    print stored
         #    chunk.update(stored)
-            
+
         self.executed = executed
         #pprint(self.executed)
         return(True)
@@ -453,7 +453,7 @@ class PwebProcessors(object):
     formats = {'python' : {'class' : PwebProcessor, 'description' :  'Python shell'},
                'ipython' : {'class' : PwebIPythonProcessor, 'description' :  'IPython shell'}
                }
-    
+
     @classmethod
     def shortformats(cls):
         fmtstring = ""
@@ -468,7 +468,7 @@ class PwebProcessors(object):
 
     @classmethod
     def getformats(cls):
-        fmtstring = "" 
+        fmtstring = ""
         for format in sorted(cls.formats):
             fmtstring += ("* %s:\n   %s\n") % (format, cls.formats[format]['description'])
         return(fmtstring)
@@ -477,7 +477,4 @@ class PwebProcessors(object):
     def listformats(cls):
         print("\nPweave supported shells:\n")
         print(cls.getformats())
-        print("More info: http://mpastell.com/pweave/ \n") 
-
-
-
+        print("More info: http://mpastell.com/pweave/ \n")
