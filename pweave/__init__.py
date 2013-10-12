@@ -3,10 +3,7 @@
 # http://mpastell.com/pweave
 
 from pweb import *
-import time
 import readers
-import templates
-import os
 from subprocess import Popen, PIPE
 
 __version__ = '0.22rc'

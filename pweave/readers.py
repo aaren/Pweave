@@ -1,6 +1,5 @@
 #Pweave readers
 import re
-import sys
 import copy
 import json
 from subprocess import Popen, PIPE
